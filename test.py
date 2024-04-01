@@ -1,6 +1,7 @@
 from pptx import Presentation
 
 
+# Testing this
 def extract_all_text(presentation_path):
     """
     Extracts all text content from a PowerPoint presentation, including nested shapes.
