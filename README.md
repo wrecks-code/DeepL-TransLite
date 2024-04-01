@@ -8,4 +8,8 @@ How to use:
 - open config.ini
 - adjust values in [SETTINGS], deepl_api_key is needed
 
-Display of character count: ![image](https://github.com/Wreck5tep/DeepL_PPTX_GUI/assets/29825723/9831644c-26b9-4f37-89bf-01989b692b78)
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Display of character count: 
+
+![image](https://github.com/Wreck5tep/DeepL_PPTX_GUI/assets/29825723/9831644c-26b9-4f37-89bf-01989b692b78)
