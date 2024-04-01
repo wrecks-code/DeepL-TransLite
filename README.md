@@ -1,5 +1,5 @@
 simple python app with gui that translates one or multiple pptx files from english to any language using the deepl API
-DeepL already has a working pptx translation ready and usable, however this costs at least 50.000 characters per translated file. This simple app 
+DeepL already has a working pptx translation ready and usable, however this costs at least 50.000 characters per translated file. This simple app does the same but only uses the actual amount of characters.
 
 
 all options are inside config.ini
