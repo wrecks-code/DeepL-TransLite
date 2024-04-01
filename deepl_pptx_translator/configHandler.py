@@ -29,8 +29,8 @@ def read_config():
     DEEPL_API_KEY = config.get("SETTINGS", "deepl_api_key")
     output_path = config.get("SETTINGS", "output_path")
     target_lang = config.get("SETTINGS", "target_lang")
-    marker_char = config.get("SETTINGS", "marker_char")
-    USE_DEEPL_API = config.getboolean("SETTINGS", "use_deepl_api")
+    marker_char = config.get("DEVELOPMENT", "marker_char")
+    USE_DEEPL_API = config.getboolean("DEVELOPMENT", "use_deepl_api")
     output_path = os.path.expandvars(output_path)
 
     print(
