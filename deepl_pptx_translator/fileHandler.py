@@ -2,6 +2,7 @@ import os
 import webbrowser
 
 import pptx
+
 from deepl_pptx_translator import apiHandler, configHandler, guiHandler, textHandler
 
 include_subdirectories = True
@@ -115,43 +116,41 @@ def translate_presentation(input_path_translate):
         guiHandler.progress_bar["value"] = progress
         guiHandler.progress_bar.update_idletasks()
 
-        # Iterate through each shape in the slide
-        for shape_count, shape in enumerate(slide.shapes):
-            print(f"Shape (Form): {shape_count}")
+        # Define a function to process shapes recursively
+        def process_shapes(shapes):
+            for shape_count, shape in enumerate(shapes):
+                print(f"Shape (Form): {shape_count}")
 
-            # Check if the shape contains text
-            if shape.has_text_frame and shape.text:
-                # Iterate through each paragraph in the shape
-                for para_count, paragraph in enumerate(shape.text_frame.paragraphs):
-                    print(f"Paragraph (Satz): {para_count}")
-                    sentence_to_translate = ""
-                    translated_sentence = ""
-
-                    # Iterate through each run (text segment) in the paragraph
-                    for run in paragraph.runs:
-                        print(f"Run (Satzabschnitt): '{run.text}'")
-                        # Concatenate text segments to form a sentence
-                        sentence_to_translate += textHandler.add_plus(run.text)
-
-                    print("Sentence to translate: " + sentence_to_translate)
-                    translated_sentence = apiHandler.translate_text_w_deepl(
-                        sentence_to_translate
-                    )
-                    print("translated sentence: " + translated_sentence)
-                    # print(f"Translated sentence: '{translated_sentence}'")
-                    # print(split_text_with_marker_plus(sentence_to_translate))
-                    # print(split_text_with_marker_plus(translated_sentence))
-                    textHandler.assign_segments_to_runs(
-                        paragraph,
-                        textHandler.split_text_with_marker(translated_sentence),
-                    )
-
-            if hasattr(shape, "shapes"):
+                # Check if the shape contains text
                 if shape.has_text_frame and shape.text:
+                    # Iterate through each paragraph and run in the shape
                     for para_count, paragraph in enumerate(shape.text_frame.paragraphs):
-                        print(f"Paragraph (NESTED): {para_count}")
+                        print(f"Paragraph (Satz): {para_count}")
+                        sentence_to_translate = ""
+                        translated_sentence = ""
+
+                        # Iterate through each run (text segment) in the paragraph
                         for run in paragraph.runs:
-                            print(f"Run (NESTED): '{run.text}'")
+                            print(f"Run (Satzabschnitt): '{run.text}'")
+                            # Concatenate text segments to form a sentence
+                            sentence_to_translate += textHandler.add_plus(run.text)
+
+                        print("Sentence to translate: " + sentence_to_translate)
+                        translated_sentence = apiHandler.translate_text_w_deepl(
+                            sentence_to_translate
+                        )
+                        print("translated sentence: " + translated_sentence)
+                        textHandler.assign_segments_to_runs(
+                            paragraph,
+                            textHandler.split_text_with_marker(translated_sentence),
+                        )
+
+                # Recursively process nested shapes
+                if hasattr(shape, "shapes"):
+                    process_shapes(shape.shapes)
+
+        # Start processing from the top-level shapes
+        process_shapes(slide.shapes)
 
     # Save the translated presentation
     presentation.save(pptx_file_path)
