@@ -34,7 +34,7 @@ def extract_all_text(presentation_path):
 
 
 # Example usage
-presentation_file = "testfile.pptx"
+presentation_file = "test_scripts/testfile.pptx"
 all_text_content = extract_all_text(presentation_file)
 
 # Print all extracted text (optional)
