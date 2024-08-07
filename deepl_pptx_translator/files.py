@@ -108,20 +108,23 @@ def count_characters_in_folder(folder_path) -> int:
     return total_characters
 
 
-def count_docx_pptx_files_in_folder(folder_path) -> int:
+def count_docx_pptx_files_in_path(_path) -> int:
+
+    if not os.path.isdir(_path):
+        return 1
 
     if INCLUDE_SUBDIRS:
         count = 0
-        for root, dirs, files in os.walk(folder_path):
+        for root, dirs, files in os.walk(_path):
             count += len([name for name in files if name.endswith((".docx", ".pptx"))])
         return count
     else:
         return len(
             [
                 name
-                for name in os.listdir(folder_path)
+                for name in os.listdir(_path)
                 if name.endswith((".docx", ".pptx"))
-                and os.path.isfile(os.path.join(folder_path, name))
+                and os.path.isfile(os.path.join(_path, name))
             ]
         )
 
