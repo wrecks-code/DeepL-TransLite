@@ -1,3 +1,4 @@
+from importlib.metadata import PackageNotFoundError
 import os
 import pptx
 import docx
@@ -42,7 +43,7 @@ def detect_language(selected_path) -> str:
     language_code = None
 
     if os.path.isdir(selected_path):
-        for root, dirs, files in os.walk(selected_path):
+        for root, _, files in os.walk(selected_path):
             for file in files:
                 file_path = os.path.join(root, file)
                 language_code = detect_language_for_file(file_path)
@@ -70,9 +71,12 @@ def detect_docx_language(docx_path) -> str:
             paragraph.text for paragraph in document.paragraphs if paragraph.text
         )
         return get_language_code(return_text)
-    except Exception as e:
-        print(f"Error processing DOCX file: {e}")
-        return None
+    except FileNotFoundError:
+        print(f"Error: The file {docx_path} was not found.")
+    except PermissionError:
+        print(f"Error: Permission denied when trying to open {docx_path}.")
+    except PackageNotFoundError:
+        print(f"Error: The file {docx_path} is not a valid .docx file or is corrupted.")
 
 
 def detect_pptx_language(pptx_path) -> str:
@@ -85,9 +89,12 @@ def detect_pptx_language(pptx_path) -> str:
             if hasattr(shape, "text")
         )
         return get_language_code(return_text)
-    except Exception as e:
-        print(f"Error processing PPTX file: {e}")
-        return None
+    except FileNotFoundError:
+        print(f"Error: The file {pptx_path} was not found.")
+    except PermissionError:
+        print(f"Error: Permission denied when trying to open {pptx_path}.")
+    except PackageNotFoundError:
+        print(f"Error: The file {pptx_path} is not a valid .pptx file or is corrupted.")
 
 
 def get_language_code(_text) -> str:
