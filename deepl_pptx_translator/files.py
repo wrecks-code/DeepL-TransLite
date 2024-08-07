@@ -12,6 +12,7 @@ PROCESSED_FILES = 0
 TRANSLATED_FILES_COUNT = 0
 
 # pylint: disable=W0603
+# pylint: disable=W0640
 
 
 def open_output_folder_in_explorer():
@@ -105,6 +106,24 @@ def count_characters_in_folder(folder_path) -> int:
 
     print(f"Total characters in folder {folder_path} is {total_characters}")
     return total_characters
+
+
+def count_docx_pptx_files_in_folder(folder_path) -> int:
+
+    if INCLUDE_SUBDIRS:
+        count = 0
+        for root, dirs, files in os.walk(folder_path):
+            count += len([name for name in files if name.endswith((".docx", ".pptx"))])
+        return count
+    else:
+        return len(
+            [
+                name
+                for name in os.listdir(folder_path)
+                if name.endswith((".docx", ".pptx"))
+                and os.path.isfile(os.path.join(folder_path, name))
+            ]
+        )
 
 
 def translate_presentation(input_path_translate):
