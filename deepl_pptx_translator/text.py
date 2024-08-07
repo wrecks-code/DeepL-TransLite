@@ -32,7 +32,7 @@ def assign_segments_to_runs(paragraph, segments):
 
 
 def detect_language(selected_path) -> str:
-    def detect_language_for_file(file_path):
+    def detect_language_for_file(file_path) -> str:
         if file_path.endswith(".docx"):
             return detect_docx_language(file_path)
         elif file_path.endswith(".pptx"):

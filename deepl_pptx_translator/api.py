@@ -4,16 +4,18 @@ import deepl
 from deepl_pptx_translator import config_handler, gui_handler
 
 
-translator = None
+TRANSLATOR = None
 translations_cache = {}
+
+# pylint: disable=W0603
 
 
 def initialize_deepl_api():
-    global translator
-    translator = deepl.Translator(config_handler.DEEPL_API_KEY)
+    global TRANSLATOR
+    TRANSLATOR = deepl.Translator(config_handler.DEEPL_API_KEY)
 
 
-def translate_text_w_deepl(text):
+def translate_text_w_deepl(text) -> str:
     if text == "":
         return ""
 
@@ -35,7 +37,7 @@ def translate_text_w_deepl(text):
         return ""
 
     # Make a new translation request
-    translated_text = translator.translate_text(
+    translated_text = TRANSLATOR.translate_text(
         text_to_translate, target_lang=gui_handler.TARGET_CHOSEN_LANG.get()
     ).text
 
