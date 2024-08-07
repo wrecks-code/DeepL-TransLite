@@ -1,7 +1,7 @@
 import configparser
 import os
 
-config_file_path = "config.ini"
+CONFIG_FILE_PATH = "config.ini"
 
 DEEPL_API_KEY, output_path, target_lang, marker_char, USE_DEEPL_API = (
     None,
@@ -13,18 +13,18 @@ DEEPL_API_KEY, output_path, target_lang, marker_char, USE_DEEPL_API = (
 
 
 def read_config():
-    from deepl_pptx_translator import guiHandler
+    from deepl_pptx_translator import gui_handler
 
     global DEEPL_API_KEY, output_path, target_lang, translator, marker_char, USE_DEEPL_API
 
-    if not os.path.exists(config_file_path):
-        guiHandler.show_noconfig_error()
+    if not os.path.exists(CONFIG_FILE_PATH):
+        gui_handler.show_noconfig_error()
 
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
     # Read the configuration file
-    config.read(config_file_path, encoding="utf-8")
+    config.read(CONFIG_FILE_PATH, encoding="utf-8")
 
     DEEPL_API_KEY = config.get("SETTINGS", "deepl_api_key")
     output_path = config.get("SETTINGS", "output_path")

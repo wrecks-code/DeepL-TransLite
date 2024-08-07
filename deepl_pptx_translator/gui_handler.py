@@ -2,11 +2,13 @@ import sys
 import tkinter
 from tkinter import Tk, filedialog, messagebox, ttk
 
-from deepl_pptx_translator import configHandler, fileHandler
+from deepl_pptx_translator import config_handler, files
 
-processing_folder = False
-progress_label = None
-progress_bar = None
+PROCESSING_FOLDER = False
+PROGRESS_LABEL = None
+PROGRESS_BAR = None
+
+# pylint: disable=W0603
 
 
 def show_infobox_at_end():
@@ -20,7 +22,7 @@ def show_infobox_at_end():
     # Your translation code here
 
     # Display the message box and make it always on top
-    message = f"Fertig!\n{fileHandler.translated_files_count} PowerPoint Datei(en) wurde(n) übersetzt."
+    message = f"Fertig!\n{files.TRANSLATED_FILES_COUNT} Datei(en) wurde(n) übersetzt."
     messagebox.showinfo("Übersetzung abgeschlossen", message)
 
     # Make the message box always on top of other windows
@@ -29,10 +31,10 @@ def show_infobox_at_end():
     # Start the Tkinter main loop
     # root.mainloop()
     root.destroy()
+    root.mainloop()
 
 
 def show_noconfig_error():
-    import deepl_pptx_translator.configHandler as configHandler
 
     # Create a hidden root window
     root = Tk()
@@ -41,9 +43,7 @@ def show_noconfig_error():
     root.withdraw()  # Hide the main window
 
     # Display the message box and make it always on top
-    message = (
-        f"Ohne {configHandler.config_file_path} kann das Programm nicht genutzt werden."
-    )
+    message = f"Ohne {config_handler.CONFIG_FILE_PATH} kann das Programm nicht genutzt werden."
     messagebox.showerror("Keine config.ini gefunden!", message)
 
     # Make the message box always on top of other windows
@@ -53,19 +53,16 @@ def show_noconfig_error():
     sys.exit()
 
 
-def mainGUI():
-    from deepl_pptx_translator import fileHandler
-
-    global translated_files_count  # Initialize the global variable
+def main_gui():
     # Set the initial count to 0#
-    global progress_bar
-    global progress_label
+    global PROGRESS_BAR
+    global PROGRESS_LABEL
 
     def select_path():
         selected_path = filedialog.askopenfilename(
-            initialdir=configHandler.output_path,
-            title="PowerPoint auswählen",
-            filetypes=[("PPTX files", "*.pptx"), ("All files", "*.*")],
+            initialdir=config_handler.output_path,
+            title="Datei auswählen",
+            filetypes=[("PPTX and DOCX files", "*.pptx *.docx")],
             defaultextension=".pptx",
         )
         if selected_path:
@@ -73,71 +70,75 @@ def mainGUI():
             entry.pack(pady=10)
             ok_button["state"] = "normal"
             additional_label.config(
-                text=f"Anzahl der Buchstaben: {fileHandler.count_characters_in_presentation(selected_path)}"
+                text=f"Anzahl der Buchstaben: {files.count_characters_in_file(selected_path)}"
             )
 
     def select_folder():
-        folder_path = filedialog.askdirectory(title="Ordner mit PowerPoints auswählen")
+        folder_path = filedialog.askdirectory(title="Ordner auswählen")
         if folder_path:
             entry_var.set(folder_path)
             entry.pack(pady=10)
             ok_button["state"] = "normal"
             additional_label.config(
-                text=f"Anzahl der Buchstaben: {fileHandler.count_characters_in_folder(folder_path)}"
+                text=f"Anzahl der Buchstaben: {files.count_characters_in_folder(folder_path)}"
             )
 
     def on_ok():
         nonlocal user_pressed_ok
-        if entry_var.get():  # Check if a folder or PPTX file is selected
+        if entry_var.get():  # Check if a folder, PPTX, or DOCX file is selected
             user_pressed_ok = True
-            if entry_var.get().endswith(".pptx"):  # Check if a file is selected
+            if entry_var.get().endswith(
+                (".pptx", ".docx")
+            ):  # Check if a file is selected
                 process_selected_file(entry_var.get())
             else:  # Assume a folder is selected
                 process_selected_folder(entry_var.get())
             root.destroy()
 
     def process_selected_file(file_path):
-        import deepl_pptx_translator.apiHandler as apiHandler
-
         # Call the function for processing a selected file
         print(f"Processing file: {file_path}")
-        processing_folder = False
-        fileHandler.translate_presentation(file_path)
-        fileHandler.open_output_folder_in_explorer()
+
+        if files.check_file_type(file_path) == "pptx":
+            files.translate_presentation(file_path)
+
+        if files.check_file_type(file_path) == "docx":
+            files.translate_document(file_path)
+
+        files.open_output_folder_in_explorer()
         show_infobox_at_end()
 
     def process_selected_folder(folder_path):
-        import deepl_pptx_translator.apiHandler as apiHandler
-
         # Call the function for processing a selected folder
         print(f"Processing folder: {folder_path}")
-        processing_folder = True
-        fileHandler.process_pptx_files(folder_path)
-        fileHandler.open_output_folder_in_explorer()
+
+        files.process_presentation_and_document_files(folder_path)
+        files.open_output_folder_in_explorer()
         show_infobox_at_end()
 
     def toggle_subdirs():
-        global include_subdirectories
-        include_subdirectories = not include_subdirectories
-        print(f"include_subdirectories={include_subdirectories}")
+        files.INCLUDE_SUBDIRS = not files.INCLUDE_SUBDIRS
+        print(f"files.INCLUDE_SUBDIRS={files.INCLUDE_SUBDIRS}")
 
     user_pressed_ok = False
 
     root = Tk()
-    root.title("DeepL PPTX GUI")
+    root.title("ISM DeepL Translation GUI")
 
-    label = ttk.Label(root, text="Präsentationen (*.pptx) zur Übersetzung auswählen")
+    label = ttk.Label(
+        root, text="Dateien (*.pptx oder *.docx) zur Übersetzung auswählen"
+    )
     label.pack(pady=10)
 
     entry_var = tkinter.StringVar()
 
     browse_file_button = tkinter.Button(
-        root, text="Einzelne PowerPoint Datei", command=select_path
+        root, text="Datei auswählen...", command=select_path
     )
     browse_file_button.pack(pady=5, side="top")  # Place the button on top
 
     browse_folder_button = tkinter.Button(
-        root, text="Ordner mit PowerPoint Dateien", command=select_folder
+        root, text="Ordner auswählen...", command=select_folder
     )
     browse_folder_button.pack(pady=5, side="top")  # Place the button on top
 
@@ -153,12 +154,12 @@ def mainGUI():
     progress_frame = tkinter.Frame(root)
     progress_frame.pack(pady=10)
 
-    progress_label = ttk.Label(progress_frame, text="")
-    progress_label.pack(side="top")
+    PROGRESS_LABEL = ttk.Label(progress_frame, text="")
+    PROGRESS_LABEL.pack(side="top")
 
-    global progress_bar
-    progress_bar = ttk.Progressbar(progress_frame, length=200, mode="determinate")
-    progress_bar.pack(side="left")
+    global PROGRESS_BAR
+    PROGRESS_BAR = ttk.Progressbar(progress_frame, length=200, mode="determinate")
+    PROGRESS_BAR.pack(side="left")
 
     entry = tkinter.Entry(root, textvariable=entry_var, state="readonly", width=40)
 
