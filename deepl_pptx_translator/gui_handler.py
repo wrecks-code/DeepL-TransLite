@@ -2,11 +2,13 @@ import sys
 import tkinter
 from tkinter import Tk, filedialog, messagebox, ttk
 
-from deepl_pptx_translator import config_handler, files
+from deepl_pptx_translator import config_handler, files, text
 
 PROCESSING_FOLDER = False
 PROGRESS_LABEL = None
 PROGRESS_BAR = None
+
+TARGET_CHOSEN_LANG = None
 
 # pylint: disable=W0603
 
@@ -69,8 +71,13 @@ def main_gui():
             entry_var.set(selected_path)
             entry.pack(pady=10)
             ok_button["state"] = "normal"
-            additional_label.config(
+            letter_count_label.config(
                 text=f"Anzahl der Buchstaben: {files.count_characters_in_file(selected_path)}"
+            )
+            _detected_file_language = text.detect_language(selected_path)
+            print(f"Detected file language: {_detected_file_language}")
+            language_detected_label.config(
+                text=f"Erkannte Sprache: {_detected_file_language}"
             )
 
     def select_folder():
@@ -79,8 +86,16 @@ def main_gui():
             entry_var.set(folder_path)
             entry.pack(pady=10)
             ok_button["state"] = "normal"
-            additional_label.config(
-                text=f"Anzahl der Buchstaben: {files.count_characters_in_folder(folder_path)}"
+            letter_count_label.config(
+                text=f"Anzahl Buchstaben: {files.count_characters_in_folder(folder_path)}"
+            )
+            _detected_file_language = text.detect_language(folder_path)
+            print(f"Detected file language: {_detected_file_language}")
+            file_count_label.config(
+                text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_folder(folder_path)}"
+            )
+            language_detected_label.config(
+                text=f"Erkannte Sprache: {_detected_file_language}"
             )
 
     def on_ok():
@@ -128,51 +143,79 @@ def main_gui():
     label = ttk.Label(
         root, text="Dateien (*.pptx oder *.docx) zur Übersetzung auswählen"
     )
-    label.pack(pady=10)
 
     entry_var = tkinter.StringVar()
 
+    button_frame = ttk.Frame(root)
+
     browse_file_button = tkinter.Button(
-        root, text="Datei auswählen...", command=select_path
+        button_frame, text="Datei auswählen...", command=select_path
     )
-    browse_file_button.pack(pady=5, side="top")  # Place the button on top
 
     browse_folder_button = tkinter.Button(
-        root, text="Ordner auswählen...", command=select_folder
+        button_frame, text="Ordner auswählen...", command=select_folder
     )
-    browse_folder_button.pack(pady=5, side="top")  # Place the button on top
 
     use_subdirs_checkbox = tkinter.Checkbutton(
         root, text="Unterordner auch durchsuchen", command=toggle_subdirs
     )
     use_subdirs_checkbox.select()
-    use_subdirs_checkbox.pack(pady=5)
 
-    additional_label = ttk.Label(root, text="Kein Ordner oder Datei ausgewählt.")
-    additional_label.pack(pady=10)
+    letter_count_label = ttk.Label(root, text="Kein Ordner oder Datei ausgewählt.")
+    file_count_label = ttk.Label(root, text="")
+    language_detected_label = ttk.Label(root, text="")
+
+    global TARGET_CHOSEN_LANG
+
+    lang_select_list = [
+        "DE",
+        "EN-GB",
+        "EN-US",
+        "FR",
+        "ES",
+        "IT",
+    ]
+
+    target_lang_frame = ttk.Frame(root)
+
+    target_lang_select_label = ttk.Label(target_lang_frame, text="Ziel Sprache: ")
+    TARGET_CHOSEN_LANG = tkinter.StringVar(root)
+    TARGET_CHOSEN_LANG.set(lang_select_list[1])
+
+    target_lang_select_menu = tkinter.OptionMenu(
+        target_lang_frame, TARGET_CHOSEN_LANG, *lang_select_list
+    )
 
     progress_frame = tkinter.Frame(root)
-    progress_frame.pack(pady=10)
 
     PROGRESS_LABEL = ttk.Label(progress_frame, text="")
-    PROGRESS_LABEL.pack(side="top")
 
     global PROGRESS_BAR
     PROGRESS_BAR = ttk.Progressbar(progress_frame, length=200, mode="determinate")
-    PROGRESS_BAR.pack(side="left")
 
     entry = tkinter.Entry(root, textvariable=entry_var, state="readonly", width=40)
 
     ok_button = tkinter.Button(root, text="Übersetzen", command=on_ok, state="disabled")
-    ok_button.pack(pady=10)
 
     # VERTICAL ALIGNMENT
     label.pack(side="top", pady=5)
-    browse_file_button.pack(side="top", pady=3)
-    browse_folder_button.pack(side="top", pady=3)
+
+    button_frame.pack(side="top")
+    browse_file_button.pack(side="left", pady=3)
+    browse_folder_button.pack(side="left", pady=3)
+
+    target_lang_frame.pack(side="top")
+    target_lang_select_label.pack(side="left", pady=3)
+    target_lang_select_menu.pack(side="left", pady=3)
+
     use_subdirs_checkbox.pack(side="top", pady=3)
-    additional_label.pack(side="top", pady=5)
+    file_count_label.pack(side="top")
+    letter_count_label.pack(side="top")
+    language_detected_label.pack(side="top")
+
     progress_frame.pack(side="top", pady=5)
+    PROGRESS_LABEL.pack(side="top", pady=5)
+    PROGRESS_BAR.pack(side="top", pady=5)
     entry.pack(side="top", pady=5)
     ok_button.pack(side="top", pady=5)
 
