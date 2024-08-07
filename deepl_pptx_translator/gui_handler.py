@@ -76,6 +76,9 @@ def main_gui():
             )
             _detected_file_language = text.detect_language(selected_path)
             print(f"Detected file language: {_detected_file_language}")
+            file_count_label.config(
+                text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_path(selected_path)}"
+            )
             language_detected_label.config(
                 text=f"Erkannte Sprache: {_detected_file_language}"
             )
@@ -92,7 +95,7 @@ def main_gui():
             _detected_file_language = text.detect_language(folder_path)
             print(f"Detected file language: {_detected_file_language}")
             file_count_label.config(
-                text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_folder(folder_path)}"
+                text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_path(folder_path)}"
             )
             language_detected_label.config(
                 text=f"Erkannte Sprache: {_detected_file_language}"
