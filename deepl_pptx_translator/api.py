@@ -1,6 +1,6 @@
 import random
 
-import deepl_pptx_translator.configHandler as configHandler
+import deepl_pptx_translator.config_handler as config_handler
 
 import deepl
 
@@ -10,14 +10,14 @@ translations_cache = {}
 
 def initialize_deepl_api():
     global translator
-    translator = deepl.Translator(configHandler.DEEPL_API_KEY)
+    translator = deepl.Translator(config_handler.DEEPL_API_KEY)
 
 
 def translate_text_w_deepl(text):
     if text == "":
         return ""
 
-    if not configHandler.USE_DEEPL_API:
+    if not config_handler.USE_DEEPL_API:
         if text.endswith(".pptx"):
             return "TESTFILE-" + text
         return str(random.randint(1, 100000))
@@ -36,7 +36,7 @@ def translate_text_w_deepl(text):
 
     # Make a new translation request
     translated_text = translator.translate_text(
-        text_to_translate, target_lang=configHandler.target_lang
+        text_to_translate, target_lang=config_handler.target_lang
     ).text
 
     # Add back the trailing space if it existed

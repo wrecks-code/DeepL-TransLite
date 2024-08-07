@@ -1,13 +1,15 @@
-from deepl_pptx_translator import configHandler
+from deepl_pptx_translator import config_handler
 
 
-def add_plus(text):
-    return configHandler.marker_char + text + configHandler.marker_char
+def add_plus(text) -> str:
+    return config_handler.marker_char + text + config_handler.marker_char
 
 
-def split_text_with_marker(text):
+def split_text_with_marker(text) -> list:
     # print("splitting " + text)
-    segments = [segment for segment in text.split(configHandler.marker_char) if segment]
+    segments = [
+        segment for segment in text.split(config_handler.marker_char) if segment
+    ]
     # print("splitted version: " + str(segments))
     return segments
 
