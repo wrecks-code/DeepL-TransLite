@@ -32,7 +32,7 @@ def assign_segments_to_runs(paragraph, segments):
         run.text = segments[i]
 
 
-def detect_language(selected_path) -> str:
+def detect_language_in_filepath(selected_path) -> str:
     def detect_language_for_file(file_path) -> str:
         if file_path.endswith(".docx"):
             return detect_docx_language(file_path)
@@ -56,9 +56,13 @@ def detect_language(selected_path) -> str:
     else:
         language_code = detect_language_for_file(selected_path)
 
+    # TODO: Refresh OptionMenu when language gets detected
+
     if language_code == "DE":
+        # gui_handler.LANG_SELECT_LIST.remove("DE")
         gui_handler.TARGET_CHOSEN_LANG.set("EN-GB")
     elif language_code == "EN-GB":
+        # gui_handler.LANG_SELECT_LIST.remove("EN-GB")
         gui_handler.TARGET_CHOSEN_LANG.set("DE")
 
     return language_code

@@ -10,6 +10,15 @@ PROGRESS_BAR = None
 
 TARGET_CHOSEN_LANG = None
 
+LANG_SELECT_LIST = [
+    "DE",
+    "EN-GB",
+    "EN-US",
+    "FR",
+    "ES",
+    "IT",
+]
+
 # pylint: disable=W0603
 
 
@@ -74,7 +83,7 @@ def main_gui():
             letter_count_label.config(
                 text=f"Anzahl der Buchstaben: {files.count_characters_in_file(selected_path)}"
             )
-            _detected_file_language = text.detect_language(selected_path)
+            _detected_file_language = text.detect_language_in_filepath(selected_path)
             print(f"Detected file language: {_detected_file_language}")
             file_count_label.config(
                 text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_path(selected_path)}"
@@ -92,7 +101,7 @@ def main_gui():
             letter_count_label.config(
                 text=f"Anzahl Buchstaben: {files.count_characters_in_folder(folder_path)}"
             )
-            _detected_file_language = text.detect_language(folder_path)
+            _detected_file_language = text.detect_language_in_filepath(folder_path)
             print(f"Detected file language: {_detected_file_language}")
             file_count_label.config(
                 text=f"Anzahl Dateien: {files.count_docx_pptx_files_in_path(folder_path)}"
@@ -170,23 +179,14 @@ def main_gui():
 
     global TARGET_CHOSEN_LANG
 
-    lang_select_list = [
-        "DE",
-        "EN-GB",
-        "EN-US",
-        "FR",
-        "ES",
-        "IT",
-    ]
-
     target_lang_frame = ttk.Frame(root)
 
     target_lang_select_label = ttk.Label(target_lang_frame, text="Ziel Sprache: ")
     TARGET_CHOSEN_LANG = tkinter.StringVar(root)
-    TARGET_CHOSEN_LANG.set(lang_select_list[1])
+    TARGET_CHOSEN_LANG.set(LANG_SELECT_LIST[1])
 
     target_lang_select_menu = tkinter.OptionMenu(
-        target_lang_frame, TARGET_CHOSEN_LANG, *lang_select_list
+        target_lang_frame, TARGET_CHOSEN_LANG, *LANG_SELECT_LIST
     )
 
     progress_frame = tkinter.Frame(root)
