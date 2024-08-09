@@ -150,7 +150,8 @@ def main_gui():
     user_pressed_ok = False
 
     root = Tk()
-    root.title("ISM DeepL Translation GUI")
+    root.title("ISM-DeepL-TransLite")
+    root.iconbitmap("icon.ico")
 
     label = ttk.Label(
         root, text="Dateien (*.pptx oder *.docx) zur Übersetzung auswählen"
